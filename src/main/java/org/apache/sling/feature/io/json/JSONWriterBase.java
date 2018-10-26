@@ -19,10 +19,7 @@ package org.apache.sling.feature.io.json;
 import java.io.StringReader;
 import java.io.Writer;
 import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.json.Json;
 import javax.json.JsonStructure;
@@ -109,9 +106,9 @@ abstract class JSONWriterBase {
 
             generator.writeStartObject(key);
 
-            final Enumeration<String> e = cfg.getProperties().keys();
-            while ( e.hasMoreElements() ) {
-                final String name = e.nextElement();
+            final Iterator<String> e = cfg.getProperties().keySet().iterator();
+            while ( e.hasNext() ) {
+                final String name = e.next();
                 if ( Configuration.PROP_ARTIFACT_ID.equals(name) ) {
                     continue;
                 }
