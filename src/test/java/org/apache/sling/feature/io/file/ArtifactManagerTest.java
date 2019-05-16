@@ -76,9 +76,9 @@ public class ArtifactManagerTest {
         when(artifactFile.exists()).thenReturn(true);
 
         final ArtifactProvider provider = mock(ArtifactProvider.class);
-        when(provider.getArtifact(REPO + "/group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt", "group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt")).thenReturn(null);
-        when(provider.getArtifact(REPO + "/group/artifact/1.0.0-SNAPSHOT/maven-metadata.xml", "org.apache.sling/group/artifact/1.0.0-SNAPSHOT/maven-metadata.xml")).thenReturn(metadataFile);
-        when(provider.getArtifact(REPO + "/group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-20160321.103951-1.txt", "group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt")).thenReturn(artifactFile);
+        when(provider.getArtifactHandler(REPO + "/group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt", "group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt")).thenReturn(null);
+        when(provider.getArtifactHandler(REPO + "/group/artifact/1.0.0-SNAPSHOT/maven-metadata.xml", "org.apache.sling/group/artifact/1.0.0-SNAPSHOT/maven-metadata.xml")).thenReturn(new ArtifactHandler(REPO + "/group/artifact/1.0.0-SNAPSHOT/maven-metadata.xml", metadataFile));
+        when(provider.getArtifactHandler(REPO + "/group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-20160321.103951-1.txt", "group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-SNAPSHOT.txt")).thenReturn(new ArtifactHandler(REPO + "/group/artifact/1.0.0-SNAPSHOT/artifact-1.0.0-20160321.103951-1.txt", artifactFile));
 
         final Map<String, ArtifactProvider> providers = new HashMap<>();
         providers.put("*", provider);

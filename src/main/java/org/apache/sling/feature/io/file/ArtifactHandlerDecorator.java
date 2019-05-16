@@ -17,56 +17,33 @@
 package org.apache.sling.feature.io.file;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * A handler provides a file object for an artifact.
- */
-public class ArtifactHandler {
-
-    private final String url;
-
-    private final File file;
+class ArtifactHandlerDecorator extends ArtifactHandler
+{
+    private final ArtifactHandler file;
 
     /**
      * Create a new handler.
-     * 
+     *
      * @param url  The url of the artifact
      * @param file The file for the artifact
      */
-    public ArtifactHandler(final String url, final File file) {
-        this.url = url;
+    public ArtifactHandlerDecorator(String url, ArtifactHandler file)
+    {
+        super(url, null);
         this.file = file;
     }
 
-    /**
-     * Get the url of the artifact
-     * 
-     * @return The url.
-     */
-    public String getUrl() {
-        return url;
+    @Override
+    public File getFile()
+    {
+        return this.file.getFile();
     }
 
-    /**
-     * Get a file for the artifact
-     * 
-     * @return The file
-     */
-    public File getFile() {
-        return file;
-    }
-
-    public URL getLocalURL() {
-        File result = getFile();
-        try
-        {
-            return result != null ? file.toURI().toURL() : null;
-        }
-        catch (MalformedURLException e)
-        {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public URL getLocalURL()
+    {
+        return this.file.getLocalURL();
     }
 }

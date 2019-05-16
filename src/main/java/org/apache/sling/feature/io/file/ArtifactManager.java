@@ -16,16 +16,17 @@
  */
 package org.apache.sling.feature.io.file;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class ArtifactManager implements AutoCloseable {
         shutdown();
     }
 
-    private final File getArtifactFromProviders(final String url, final String relativeCachePath) throws IOException {
+    private final ArtifactHandler getArtifactFromProviders(final String url, final String relativeCachePath) throws IOException {
         final int pos = url.indexOf(":");
         final String scheme = url.substring(0, pos);
 
@@ -120,7 +121,10 @@ public class ArtifactManager implements AutoCloseable {
         if ( provider == null ) {
             throw new IOException("No URL provider found for " + url);
         }
-        return provider.getArtifact(url, relativeCachePath);
+
+        logger.debug("Checking {} to get artifact from {}", provider, url);
+
+        return provider.getArtifactHandler(url, relativeCachePath);
     }
 
     /**
@@ -149,11 +153,11 @@ public class ArtifactManager implements AutoCloseable {
             while ( url.charAt(pos) == '/') {
                 pos++;
             }
-            final File file = this.getArtifactFromProviders(url, url.substring(pos));
-            if ( file == null || !file.exists()) {
+            final ArtifactHandler file = this.getArtifactFromProviders(url, url.substring(pos));
+            if ( file == null ) {
                 throw new IOException("Artifact " + url + " not found.");
             }
-            return new ArtifactHandler(url, file);
+            return file;
 
         } else {
             // file (either relative or absolute)
@@ -172,23 +176,12 @@ public class ArtifactManager implements AutoCloseable {
             builder.append(path);
 
             final String artifactUrl = builder.toString();
-            final int pos = artifactUrl.indexOf(":");
-            final String scheme = artifactUrl.substring(0, pos);
 
-            ArtifactProvider handler = this.providers.get(scheme);
-            if ( handler == null ) {
-                handler = this.providers.get("*");
-            }
-            if ( handler == null ) {
-                throw new IOException("No URL handler found for " + artifactUrl);
-            }
+            ArtifactHandler handler = getArtifactFromProviders(artifactUrl, path);
 
-            logger.debug("Checking {} to get artifact from {}", handler, artifactUrl);
-
-            final File file = handler.getArtifact(artifactUrl, path);
-            if ( file != null ) {
+            if ( handler != null ) {
                 logger.debug("Found artifact {}", artifactUrl);
-                return new ArtifactHandler(artifactUrl, file);
+                return handler;
             }
 
             // check for SNAPSHOT
@@ -211,11 +204,11 @@ public class ArtifactManager implements AutoCloseable {
                         while ( fullURL.charAt(pos2) == '/') {
                             pos2++;
                         }
-                        final File file2 = this.getArtifactFromProviders(fullURL, path);
-                        if ( file2 == null || !file2.exists()) {
+                        final ArtifactHandler file2 = this.getArtifactFromProviders(fullURL, path);
+                        if ( file2 == null) {
                             throw new IOException("Artifact " + fullURL + " not found.");
                         }
-                        return new ArtifactHandler(artifactUrl, file2);
+                        return new ArtifactHandlerDecorator(artifactUrl, file2);
                     }
                 } catch ( final IOException ignore ) {
                     // we ignore this but report the original 404
@@ -228,10 +221,11 @@ public class ArtifactManager implements AutoCloseable {
 
     protected String getFileContents(final ArtifactHandler handler) throws IOException {
         final StringBuilder sb = new StringBuilder();
-        for(final String line : Files.readAllLines(handler.getFile().toPath())) {
-            sb.append(line).append('\n');
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(handler.getLocalURL().openStream(), "UTF-8"))) {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                sb.append(line).append('\n');
+            }
         }
-
         return sb.toString();
     }
 

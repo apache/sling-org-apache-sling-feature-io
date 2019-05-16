@@ -18,6 +18,10 @@ package org.apache.sling.feature.io.file.spi;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.sling.feature.io.file.ArtifactHandler;
 
 /**
  * The artifact provider is an extension point for providing artifacts
@@ -52,4 +56,14 @@ public interface ArtifactProvider {
      * @return A file if the artifact exists or {@code null}
      */
     File getArtifact(String url, String relativeCachePath);
+
+    default ArtifactHandler getArtifactHandler(String url, String relativeCachePath) {
+        File result = getArtifact(url, relativeCachePath);
+        if (result != null && result.exists()) {
+            return new ArtifactHandler(url, result);
+        }
+        else {
+            return null;
+        }
+    }
 }
