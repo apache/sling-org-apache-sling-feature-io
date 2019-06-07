@@ -56,8 +56,6 @@
                             org.apache.felix.utils.version
                         </Conditional-Package>
                     </instructions>
-                    <!--  Skip baselining for 0.x version -->
-                    <skip>true</skip>
                 </configuration>
             </plugin>
             <plugin>
