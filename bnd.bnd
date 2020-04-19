@@ -1,5 +1,3 @@
--conditionalpackage: org.apache.felix.configurator.impl.json,\\
-                     org.apache.felix.configurator.impl.model,\\
-                     org.apache.felix.utils.collections,\\
+-conditionalpackage: org.apache.felix.utils.collections,\\
                      org.apache.felix.utils.resource,\\
                      org.apache.felix.utils.version
