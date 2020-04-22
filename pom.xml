@@ -72,7 +72,7 @@
                             <shadeSourcesContent>true</shadeSourcesContent>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.apache.felix</pattern>
+                                    <pattern>org.apache.felix.utils</pattern>
                                     <shadedPattern>org.apache.sling.feature.io.impl.felix</shadedPattern>
                                 </relocation>
                             </relocations>
