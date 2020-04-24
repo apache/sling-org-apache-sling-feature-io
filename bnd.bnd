@@ -1,3 +1,0 @@
--conditionalpackage: org.apache.felix.utils.collections,\\
-                     org.apache.felix.utils.resource,\\
-                     org.apache.felix.utils.version

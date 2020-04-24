@@ -1,7 +1,0 @@
-{
-    "id" : "org.apache.sling/test-feature2/1.0.0.0",
-    "variables": {
-        "foo": "bar",
-        "zar": null
-    }
-}
